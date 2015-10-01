@@ -5,7 +5,7 @@ setup(
     version='0.1.23',
     description='Python service manager that can be used as a websocket server',
     author='CDSP',
-    author_email='itcdsp-scpolst@sciencespo.fr',
+    author_email='zephserver-scpolst@sciencespo.fr',
     url='https://github.com/CDSP/zeph',
     keywords=['websocket', 'zeph', 'server', 'zephserver'],
     install_requires=['django','tornado'],
