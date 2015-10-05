@@ -169,7 +169,7 @@ class ClusterAdapter(Thread):
                         'data' : data
                     }
                     json_dict = json.dumps(local_dict)
-                    if len(json_dict) > 3500:
+                    if len(json_dict) > 3900:
                         self._big_message_handler.send_message(json_dict)
                     else:
                     # sending data top all the servers on the cluster
@@ -242,7 +242,7 @@ class _BigMessageHandler(object):
             slice the message in 3500 bytes chunks and sending them as multipart message
         '''
         message_id = uuid.uuid1().hex
-        chunk_length = 3500
+        chunk_length = 1800
         splidetd = [data[i:i + chunk_length] for i in range(0, len(data), chunk_length) ]
         sent_data = {
             'uuid' : message_id,
