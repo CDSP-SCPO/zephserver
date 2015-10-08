@@ -20,7 +20,7 @@ License
 
 import sys
 import socket
-from .zephserversettings import CONFIGURATION_NETWORK_INTERFACE
+from zephserversettings import CONFIGURATION_NETWORK_INTERFACE
 
 command_asked = sys.argv[1]
 try:

@@ -17,7 +17,7 @@ License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 '''
 
-import os
+import os, sys
 import json
 import logging
 import tornado.httpserver
@@ -35,6 +35,10 @@ from zephserversettings import PORT_ZEPH
 
 from zephserver.infra.service_manager import ServiceManager
 from zephserver.service.service_interface import ServiceInterface
+try:
+    from zephserversettings import DJANGO
+except: 
+    from zephserver.settings import DJANGO
 
 class ClientSocketService(websocket.WebSocketHandler):
 		
@@ -42,25 +46,28 @@ class ClientSocketService(websocket.WebSocketHandler):
 		"""Store a reference to the "external" RoomHandler instance"""
 		self._inmessage = {}
 		self.__clientID = None
-		self.__rh = ServiceManager.get_instance().get_service('zephserver.service.clientsocket_service/StartClientSocket').get_room_handler()
+		self.__user = None
+		self.__rh = ServiceManager.get_instance().get_service('zephserver.service.roomhandler_service/RoomHandler')
+		self.__session = ServiceManager.get_instance().get_service('zephserver.service.session_service/ZephSession')
 	
 	def check_origin(self, origin):
 		return True
 	
-	@Djangosession
-	def on_message(self, user, message):
+	def on_message(self, message):
+		self.get_user(message)
 		self._inmessage = json.loads(message)
 		if self.__clientID is None:
-			self.__clientID = user.id
-
-		self._inmessage["usersession"]= user
+			self.__clientID = self.__user.id
+		logging.info(message)
+		self._inmessage["usersession"]= self.__user
 		if "task" in self._inmessage:
 			self._inmessage["cid"]= self.__cid
 			service_manager = ServiceManager.get_instance()
 			routeur_service = service_manager.get_service('zephserver.service.routeur_service/RouteurService')
 			routeur_service.route(self._inmessage)
 		else:
-			cid = self.__rh.add_roomuser(message, user)	
+			logging.info(message)
+			cid = self.__rh.add_roomuser(message, self.__user)	
 			self.__cid = cid
 			self.__rh.add_client_wsconn(self.__cid, self)
 
@@ -72,7 +79,17 @@ class ClientSocketService(websocket.WebSocketHandler):
 	def on_close(self):
 		self.__rh.remove_client(self.__cid)
 
-				
+	def get_user(self, message):			
+		if DJANGO:
+			self.__user = self.__session.get_current_user(self, message)
+		else:
+			mess = json.loads(message)
+			logging.info(mess)
+			class Dummy(object): pass
+			self.__user = Dummy()
+			self.__user.id = mess['session_id']['id']
+			self.__user.username = mess['session_id']['username']
+			
 settings = {
 	"static_path": os.path.join(os.path.dirname(__file__), "static"),
 	
@@ -86,7 +103,7 @@ class StartClientSocket(ServiceInterface):
 	_cluster = None
 	
 	def main(self):
-		self._room_handler = RoomHandler()
+		self._room_handler = ServiceManager.get_instance().get_service('zephserver.service.roomhandler_service/RoomHandler')
 		self._cluster = ClusterAdapter.get_instance()
 		self._cluster.suscribe('clientsocket_send', self.say_cluster_callback)
 		logging.info('launching ClientSocketService service')
@@ -98,9 +115,6 @@ class StartClientSocket(ServiceInterface):
 		http_server.listen(PORT_ZEPH)
 		tornado.ioloop.IOLoop.instance().start()
 		logging.info('Tornado started')
-	
-	def get_room_handler(self):
-		return self._room_handler
 	
 	def say(self, answer, from_cluster=False):
 		if 'cid' not in answer and not from_cluster:

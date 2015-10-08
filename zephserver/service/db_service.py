@@ -43,8 +43,8 @@ class DbService(ServiceInterface):
 	def reset_db(self):
 		from django import db
 		logging.info('closing db')
-		db.close_connection()
-
+		connection.close()
+		
 	def disable(self):
 		logging.warning('asking to stop db service')
 		self._shutdown_event.set()

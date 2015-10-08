@@ -23,8 +23,13 @@ import django.conf
 import django.contrib.auth
 import django.utils.importlib
 import logging
-import json
+import json, sys
+import traceback
 from zephserver.infra.service_manager import ServiceManager
+try:
+	from zephserversettings import SAME_DOMAIN
+except: 
+	from zephserver.settings import SAME_DOMAIN
 
 class DecorMethod(object):
 	def __init__(self, decor, instance):
@@ -57,13 +62,21 @@ class Djangosession(object):
 		return closure(*args, **kwargs)
 	
 	def get_django_session(self, instance, message):
+		logging.info('message %s' ,message)
 		message_content = json.loads(message[0])
+		logging.info(message_content)
 		engine = django.utils.importlib.import_module(django.conf.settings.SESSION_ENGINE)
 		try:
-			session_key = message_content['session_id']
+			if SAME_DOMAIN == True :
+				session_key = instance.get_cookie('sessionid')
+			else:
+				session_key = message_content['session_id']
+			
 		except:
-			pass
+			exc_type, exc_value, exc_traceback = sys.exc_info()
+			logging.error(traceback.format_exception(exc_type, exc_value, exc_traceback))
 		self._session = engine.SessionStore(session_key)
+		logging.info('session %s'% self._session)
 		return self._session
 
 	@staticmethod
@@ -82,6 +95,7 @@ class Djangosession(object):
 			#on essaye de se recuperer la session
 			django_request.session = self.get_django_session(instance, message)
 			user = django.contrib.auth.get_user(django_request)
+			logging.info('user session %s'% user.id)
 		except:
 			# en cas d'echec on reset la connexion a la db
 			logging.info('db connection failed, trying reseting db')
