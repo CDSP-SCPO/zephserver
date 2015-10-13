@@ -16,6 +16,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     entry_points = {
-        'console_scripts': ['zephserver=zephserver.main:main'],
+        'console_scripts': ['zephserver-stop=zephserver.admin.command:stop',
+                            'zephserver-command=zephserver.admin.command:command'],
     }
 )

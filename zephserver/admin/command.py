@@ -20,33 +20,66 @@ License
 
 import sys
 import socket
-from zephserversettings import CONFIGURATION_NETWORK_INTERFACE
 
-command_asked = sys.argv[1]
-try:
-	command_to_serv = sys.argv[2:]
-	command_to_serv_string = command_asked
-	for string in command_to_serv:
-		command_to_serv_string += ' ' + string
-except:
-	command_to_serv_string = command_asked
+def main(argv, target=None):
+	if target is None:
+		from zephserversettings import CONFIGURATION_NETWORK_INTERFACE
+		target = CONFIGURATION_NETWORK_INTERFACE
 
-s = socket.socket(socket.AF_UNIX)
-s.connect(CONFIGURATION_NETWORK_INTERFACE)
-if command_to_serv != None:
-	s.sendall(command_to_serv_string)
-else :
-	s.sendall(command_to_serv_string)
-ready = True
-while(ready):
-	data = s.recv(1024)
-	
-	if  data != None and data != '':#signal de fin de communication
-		lines = str(data).split('\n')
-		for line in lines:
-			if '#!#end_communication#!#' == line:
-				ready = False
-				break
-			else:
-				print (line)
-s.close()
+	command_asked = argv[0]
+	try:
+		command_to_serv = argv[1:]
+		command_to_serv_string = command_asked
+		for string in command_to_serv:
+			command_to_serv_string += ' ' + string
+	except:
+		command_to_serv_string = command_asked
+
+	print command_to_serv_string
+	s = socket.socket(socket.AF_UNIX)
+	s.connect(target)
+	if command_to_serv != None:
+		s.sendall(command_to_serv_string)
+	else :
+		s.sendall(command_to_serv_string)
+	ready = True
+	while(ready):
+		data = s.recv(1024)
+		
+		if  data != None and data != '':#signal de fin de communication
+			lines = str(data).split('\n')
+			for line in lines:
+				if '#!#end_communication#!#' == line:
+					ready = False
+					break
+				else:
+					print(line)
+	s.close()
+
+
+def stop():
+	if len(sys.argv) > 1:
+		target = sys.argv[1]
+		main(['stop'], target=target)
+	else:
+		main(['stop'])
+
+def command():
+	args = sys.argv[1:]
+	to_remove = None
+	target = None
+	for arg in args:
+		if arg.startswith('--interface='):
+			target=arg[len('--interface='):]
+			to_remove = arg
+	if not to_remove is None:
+		args.remove(to_remove)
+
+	if not target is None:
+		main(args, target=target)
+	else:
+		main(args)
+
+
+if __name__ == '__main__':
+	main(sys.argv[1:])
