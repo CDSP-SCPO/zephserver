@@ -29,8 +29,10 @@ CONFIGURATION_NETWORK_INTERFACE_SERVER = './interface.sock'
 
 #liste des services a activer
 SERVICE_LIST = [
-	'zephserver.service.db_service/DbService',
+    'zephserver.service.db_service/DbService',
     'zephserver.service.routeur_service/RouteurService',
+    'zephserver.service.roomhandler_service/RoomHandler',
+    'zephserver.service.session_service/ZephSession',
     'zephserver.service.clientsocket_service/StartClientSocket',
 ]
 

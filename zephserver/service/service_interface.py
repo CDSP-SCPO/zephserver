@@ -21,9 +21,15 @@ License
 
 class ServiceInterface(object):
 
+	def __init__(self):
+		# your initiliser here
+		pass
+
 	def main(self):
+		# your main code here
 		pass
 
 	def disable(self):
+		# some code to ask the service to die here
 		pass
 		
