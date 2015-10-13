@@ -4,6 +4,8 @@
 Zephserver is a python service manager that can be used in a cluster.
 It has been written to support a websocket server but it can be used for any other stuff needing full time services or cluster management.
 
+More documentation on how the server works [here](http://zephserver.readthedocs.org/en/latest/)
+
 ## Quickstart
 
 To use zephserver you will need python 2.7. It should not work on python 3 and a Unix compatible system.
