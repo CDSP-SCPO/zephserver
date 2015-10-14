@@ -8,7 +8,7 @@ setup(
     author_email='zephserver-scpolst@sciencespo.fr',
     url='https://github.com/CDSP/zeph',
     keywords=['websocket', 'zeph', 'server', 'zephserver'],
-    install_requires=['django','tornado'],
+    install_requires=['tornado'],
     classifiers=['Operating System :: POSIX',
                  'Development Status :: 2 - Pre-Alpha',
                  'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
