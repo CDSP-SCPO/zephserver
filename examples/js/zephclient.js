@@ -1,23 +1,11 @@
 "use strict";
-// version: 2015-05
+// version: 2015-10
 
 var currentLocation = window.location.host;
 /*
 Libs pour l'envoie et la réception de json entre le client et le serveur ElipssWebSocket
 
--- Instancie l'objet ElipssWebSocket avec en paramètre:
-	-la callback (le message que l'on va recevoir)
-	-le port (ex 8080,8081)
-	-la room (par défaut l'url actuel)
-
-Function disponible :
-	-sendMessage --> prend en paramètre le message crée au dessus et l'envoie au serveur ARG: message
-
-EX : 
-
-var callback = function(evt){jQuery.parseJSON(console.log(evt.data))};
-var socketA = new Zephclient();
-socketA.send("echo",{toto:toto});
+Documentation : http://zephserver.readthedocs.org/en/latest/client.html
 */
 function Zephclient(session, url, room, messageCallback){
 	var self = this;
@@ -47,7 +35,10 @@ function Zephclient(session, url, room, messageCallback){
 		}
 	}
 
-	//default callback if the user do not overide the main callback
+	/**
+	* private
+	* default callback if the user do not overide the main callback
+	*/
 	self.defaultCallBack = function(event)
 	{
 		data = JSON.parse(event.data);
