@@ -12,11 +12,11 @@ This protocol is too unstable to be documented and it is strongly advised to use
 
 Zephclient object
 -----------------
-The library is on simple javascipt object. The constructopr is :
+The library is on simple javascipt object. The constructor is :
 
 ``Zephclient(session, url, room, messageCallback)`` 
 
--session is a string containning the session token (only used if you are using the django session and not on the same domain) it is optional
+-session is a string containning the session token (only used if you are using the Django session and not on the same domain) it is optional
 
 -url if the full url with port to the zephserver server (ie: wss://domaine.tld:8080/foo). It is optional, if you leave it undefined it will be ws://domain.tld/ws where domaine.tld is the current used domain
 
