@@ -67,6 +67,8 @@ If the server died without the zephserver command (crash) you will have to remov
 
 `pip install zephserver`
 
+If you wants to use django services (db_service and session backend with django) install django(only version 1.7 is supported)
+
 #### 2.Create your folder
 
 `mkdir myserver`
@@ -79,7 +81,7 @@ take zephsettings.py file from the example folder.
 
 #### 4.Add the starter file
 
-If you use django Copy the zephstarter.py file otherwise copy zephstarter_no_django.py file in your folder
+If you use django Copy the zephstarter.py file and adpt it to your application otherwise copy zephstarter_no_django.py file in your folder
 
 #### 7.Start your server
 
