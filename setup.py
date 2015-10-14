@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 setup(
     name='zephserver',
     packages=find_packages(),
-    version='0.1.24',
+    version='0.1.25',
     description='Python service manager that can be used as a websocket server',
     author='CDSP',
     author_email='zephserver-scpolst@sciencespo.fr',
