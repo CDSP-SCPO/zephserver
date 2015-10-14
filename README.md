@@ -8,7 +8,7 @@ More documentation on how the server works [here](http://zephserver.readthedocs.
 
 ## Quickstart
 
-To use zephserver you will need python 2.7. It should not work on python 3 and a Unix compatible system.
+To use zephserver you will need python 2.7. It should not work on python 3 and a Unix incompatible system.
 
 ### Quickstart as service manager
 
