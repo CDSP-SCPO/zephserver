@@ -51,7 +51,7 @@ class TestClusterController(unittest.TestCase):
 		#apres chaque test on eteint le serveur
 		cluster_adapter = ClusterAdapter.get_instance()
 		cluster_adapter._stop_service = False
-		cluster_adapter._suscribers = {}
+		cluster_adapter._subscribers = {}
 
 
 	#tests du sigleton
@@ -66,28 +66,28 @@ class TestClusterController(unittest.TestCase):
 		sm2 = ClusterAdapter.get_instance()
 		self.assertEqual(sm1, sm2)
 
-	def test_suscribe_no_event(self):
+	def test_subscribe_no_event(self):
 		event = 'toto'
 		def callback(self):
 			self._test_callback = True
 		cluster_adapter = ClusterAdapter.get_instance()
-		cluster_adapter.suscribe(event, callback)
+		cluster_adapter.subscribe(event, callback)
 		
-		self.assertEqual(cluster_adapter._suscribers.has_key(event), True)
-		self.assertEqual(len(cluster_adapter._suscribers), 1)
-		self.assertEqual(cluster_adapter._suscribers[event][0], callback)
+		self.assertEqual(cluster_adapter._subscribers.has_key(event), True)
+		self.assertEqual(len(cluster_adapter._subscribers), 1)
+		self.assertEqual(cluster_adapter._subscribers[event][0], callback)
 
-	def test_suscribe_alrady_event(self):
+	def test_subscribe_alrady_event(self):
 		event = 'toto'
 		def callback(self):
 			self._test_callback = True
 		cluster_adapter = ClusterAdapter.get_instance()
-		self.assertEqual(cluster_adapter.suscribe(event, callback), True)
-		self.assertEqual(cluster_adapter._suscribers.has_key(event), True)
-		self.assertEqual(len(cluster_adapter._suscribers[event]), 1)
-		self.assertEqual(cluster_adapter._suscribers[event][0], callback)
-		self.assertEqual(cluster_adapter.suscribe(event, callback), True)
-		self.assertEqual(len(cluster_adapter._suscribers[event]), 2)
+		self.assertEqual(cluster_adapter.subscribe(event, callback), True)
+		self.assertEqual(cluster_adapter._subscribers.has_key(event), True)
+		self.assertEqual(len(cluster_adapter._subscribers[event]), 1)
+		self.assertEqual(cluster_adapter._subscribers[event][0], callback)
+		self.assertEqual(cluster_adapter.subscribe(event, callback), True)
+		self.assertEqual(len(cluster_adapter._subscribers[event]), 2)
 
 
 if __name__ == '__main__':

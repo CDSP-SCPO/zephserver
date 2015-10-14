@@ -27,8 +27,7 @@ class ClusterAdapter(Thread):
         in JSON and sended to the cluster via the network. 
 
         If the message is too long it will be slices in smaller messages by 
-        sender and rebuilt by receiver (implemented but not used nor tested yet
-        see _BigMessageHandler)
+        sender and rebuilt by receiver 
 
         If the CLUSTER_SERVER_LIST variable in the configuration file est shorter than two
         elements, the cluster will act like if there is an actual cluster of server but it 
@@ -47,7 +46,7 @@ class ClusterAdapter(Thread):
     _stop_service = False
     _main_listening_socket = None
     _answer_socket = None
-    _suscribers = {}
+    _subscribers = {}
     _big_message_handler = None
 
     def __init__(self):
@@ -121,31 +120,31 @@ class ClusterAdapter(Thread):
             clear_data = json.loads(data)
             if clear_data.has_key('event'):
                 event = clear_data['event']
-                if self._suscribers.has_key(event):
-                    for suscriber in self._suscribers[event]:
+                if self._subscribers.has_key(event):
+                    for subscriber in self._subscribers[event]:
                         try:
-                            suscriber(clear_data)
+                            subscriber(clear_data)
                         except Exception, e:
-                            logging.warning('cannot execute suscriber error %s', str(e))
+                            logging.warning('cannot execute subscriber error %s', str(e))
 
         except:
             logging.warning('execution failed data : %s', data)
 
 
-    def suscribe(self, event, callback):
+    def subscribe(self, event, callback):
         '''
-            Public method for a service (or wathever function) to suscribe to a 
+            Public method for a service (or wathever function) to subscribe to a 
             cluster event
 
             event : string : name of the event
             callback : function : function to call when receiving the event
             
-            warning : there is no method to unsuscribe...yet
+            warning : there is no method to unsubscribe...yet
         '''
         if event != None and callback != None:
-            if not self._suscribers.has_key(event):
-                self._suscribers[event] = []
-            self._suscribers[event].append(callback)
+            if not self._subscribers.has_key(event):
+                self._subscribers[event] = []
+            self._subscribers[event].append(callback)
             return True
         else:
             return False
@@ -156,7 +155,7 @@ class ClusterAdapter(Thread):
             build the json and send it to the whole cluster
 
             event : string : name of the event to call
-            data : dict : data to pass to the suscriber on the other servers. 
+            data : dict : data to pass to the subscriber on the other servers. 
                           Must be json serializable
         '''
         if len(CLUSTER_SERVER_LIST) > 1:
@@ -235,7 +234,7 @@ class _BigMessageHandler(object):
 
     def __init__(self, cluster_adapter):
         self._cluster_adapter = cluster_adapter
-        self._cluster_adapter.suscribe('multipart', self.multipart_callback)
+        self._cluster_adapter.subscribe('multipart', self.multipart_callback)
 
     def send_message(self, data):
         '''

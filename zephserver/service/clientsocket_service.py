@@ -105,7 +105,7 @@ class StartClientSocket(ServiceInterface):
 	def main(self):
 		self._room_handler = ServiceManager.get_instance().get_service('zephserver.service.roomhandler_service/RoomHandler')
 		self._cluster = ClusterAdapter.get_instance()
-		self._cluster.suscribe('clientsocket_send', self.say_cluster_callback)
+		self._cluster.subscribe('clientsocket_send', self.say_cluster_callback)
 		logging.info('launching ClientSocketService service')
 		application = tornado.web.Application([
 			(r"/", ClientSocketService),
