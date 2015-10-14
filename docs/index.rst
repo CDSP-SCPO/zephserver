@@ -42,11 +42,11 @@ A simple description of the cluster manager could be you say that it permit you 
 
 It needs the **CLUSTER_SERVER_LIST** variable in the settings to be able to build the cluster. If this variable is empty or composed by only one element, there will not be a cluster. In that case the cluster manager will do nothing when you call the api function (and therefore always successfully send messages).
 
-If the **CLUSTER_SERVER_LIST** contains more than one element (one by server in the cluster including the current server), you can send an event to the whole cluster by calling the *say* method. The first parameter is a string containing the name of the event, the second parameter is a serializable object which will be passed to the suscribers.
+If the **CLUSTER_SERVER_LIST** contains more than one element (one by server in the cluster including the current server), you can send an event to the whole cluster by calling the *say* method. The first parameter is a string containing the name of the event, the second parameter is a serializable object which will be passed to the subscribers.
 
-To suscribe to an event call the *suscribe* method passing the name of the event as first argument and the function as the second to call when the event is triggered. The function must accept at least one argument. The argument passed to the suscriber is the called in the cluster_manager thread (so, it have to have a short execution time) and it will get the deserialized object as argument.
+To subscribe to an event call the *subscribe* method passing the name of the event as first argument and the function as the second to call when the event is triggered. The function must accept at least one argument. The argument passed to the subscriber is the called in the cluster_manager thread (so, it have to have a short execution time) and it will get the deserialized object as argument.
 
-**CAUTION** : there is currently no way to unsuscribe from an event so don't use it in the tasks or other objects with short lifespan.
+**CAUTION** : there is currently no way to unsubscribe from an event so don't use it in the tasks or other objects with short lifespan.
 
 
 External_control
