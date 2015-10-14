@@ -65,11 +65,11 @@ function Zephclient(session, url, room, messageCallback){
 	};
 
 	/**
-	* suscribe to a task if the default callback is not overriden
+	* subscribe to a task if the default callback is not overriden
 	* task : the name of the task you are waiting
 	* callback : the callback to call when this task speaks
 	*/
-	self.suscribe = function(task, callback)
+	self.subscribe = function(task, callback)
 	{
 		if(self.callbackTable[task] != undefined)
 		{
@@ -83,11 +83,11 @@ function Zephclient(session, url, room, messageCallback){
 	};
 
 	/**
-	* unsuscribe from a task if the default callback is not overriden
+	* unsubscribe from a task if the default callback is not overriden
 	* task : the name of the task
 	* callback : the callback to remove 
 	*/
-	self.unsuscribe = function(task, callback)
+	self.unsubscribe = function(task, callback)
 	{
 		if(self.callbackTable[task] != undefined)
 		{
