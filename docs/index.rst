@@ -99,15 +99,17 @@ The websocket is composed by 4 services : websocket_client, session_manager, roo
 
 Websocket_client
 ----------------
-TODO
+This part handle the websocket connection and dispatch the tasks to the router service. It also recover the session from the session service and call the roomhandler service to create a room if it does not exist and store the user client inside.
 
 Session_manager
 ---------------
-TODO
+The session manager recover a session from the client side. For the moment the one used inside the server is for django, it return the user object from the request. 
+You can implement your own session manager and then change the variable in the zephserversttings.py to indicate the path of your service. If you do that you need to implement the get_user_session(instance, message) with this two parameters. It should return a user object with an id and a username (it can be anonymous).
 
 Room_handler
 ------------
-TODO
+The room handler creates a room with all the informations we need, like the user, the connection and it creates a unique id for each connections.
+You can implement your own room handler and then change the variable in the zephserversttings.py to indicate the path of your service.
 
 Router
 ------
