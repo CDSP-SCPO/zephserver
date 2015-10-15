@@ -23,7 +23,6 @@ import logging
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web 
-import django.core.handlers.wsgi
 import tornado.wsgi
 from tornado import websocket
 # django settings must be called before importing models
@@ -35,10 +34,6 @@ from zephserversettings import PORT_ZEPH, MY_ROOM_HANDLER, MY_SESSION_HANDLER
 
 from zephserver.infra.service_manager import ServiceManager
 from zephserver.service.service_interface import ServiceInterface
-try:
-    from zephserversettings import DJANGO
-except: 
-    from zephserver.settings import DJANGO
 
 class ClientSocketService(websocket.WebSocketHandler):
 		
@@ -80,22 +75,14 @@ class ClientSocketService(websocket.WebSocketHandler):
 		self.__rh.remove_client(self.__cid)
 
 	def get_user(self, message):			
-		if DJANGO:
-			self.__user = self.__session.get_current_user(self, message)
-		else:
-			mess = json.loads(message)
-			logging.info(mess)
-			class Dummy(object): pass
-			self.__user = Dummy()
-			self.__user.id = mess['session_id']['id']
-			self.__user.username = mess['session_id']['username']
+		self.__user = self.__session.get_current_user(self, message)
+		
 			
 settings = {
 	"static_path": os.path.join(os.path.dirname(__file__), "static"),
 	
 	} 
 # map the Urls to the class		  
-wsgi_app = tornado.wsgi.WSGIContainer(django.core.handlers.wsgi.WSGIHandler())
 
 class StartClientSocket(ServiceInterface):
 	
@@ -109,7 +96,6 @@ class StartClientSocket(ServiceInterface):
 		logging.info('launching ClientSocketService service')
 		application = tornado.web.Application([
 			(r"/", ClientSocketService),
-			('.*', tornado.web.FallbackHandler, dict(fallback=wsgi_app)),
 		], **settings)
 		http_server = tornado.httpserver.HTTPServer(application)
 		http_server.listen(PORT_ZEPH)
