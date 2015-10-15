@@ -81,6 +81,7 @@ class ServiceManager(object):
 		if self._services_available.has_key(service_name) and not self._services_enable.has_key(service_name) and self._pending_stop == False:
 			self._manipulating_service_lock.acquire()
 			try:
+				service = None
 				if self._services_available.has_key(service_name) and not self._services_enable.has_key(service_name) and self._pending_stop == False:
 					logging.debug('enabeling service %s', service_name)
 					service = self._services_available[service_name]
@@ -91,7 +92,8 @@ class ServiceManager(object):
 						service.start()
 					service.get_service_lock().acquire()
 			finally:
-				service.get_service_lock().release()
+				if not service is None:
+					service.get_service_lock().release()
 				self._manipulating_service_lock.release()
 				return True
 		else:
