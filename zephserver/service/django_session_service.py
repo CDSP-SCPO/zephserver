@@ -19,8 +19,11 @@ License
 
 
 # django settings must be called before importing models
-import django.conf
-import django.contrib.auth
+try:
+    import django.conf
+    import django.contrib.auth
+except:
+    pass
 import importlib
 import logging
 import json, sys
@@ -65,7 +68,10 @@ class ZephSession(ServiceInterface):
         logging.info('message %s' ,message)
         message_content = json.loads(message)
         logging.info(message_content)
-        engine = importlib.import_module(django.conf.settings.SESSION_ENGINE)
+        try:
+            engine = importlib.import_module(django.conf.settings.SESSION_ENGINE)
+        except:
+            pass
         try:
             if SAME_DOMAIN == True :
                 session_key = instance.get_cookie('sessionid')

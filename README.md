@@ -47,7 +47,7 @@ Respect the syntax `my_server.my_package.my_service/MyService` syntaxe.
 
 example for the service_interface it would be `'zephserver.service.service_interface/ServiceInterface'`
 
-nota : there is no need to the service object to have the same name as its file and there can be multiple services in a file.
+nota : there is no need for the service object to have the same name as its file and there can be multiple services in a file.
 
 #### 7.Start your server
 

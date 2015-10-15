@@ -31,7 +31,7 @@ from tornado import websocket
 from zephserver.utils.roomhandler.roomhandler import RoomHandler
 from zephserver.utils.decorator.sessiondecorator import Djangosession
 from zephserver.infra.cluster_adapter import ClusterAdapter
-from zephserversettings import PORT_ZEPH
+from zephserversettings import PORT_ZEPH, MY_ROOM_HANDLER, MY_SESSION_HANDLER
 
 from zephserver.infra.service_manager import ServiceManager
 from zephserver.service.service_interface import ServiceInterface
@@ -47,8 +47,8 @@ class ClientSocketService(websocket.WebSocketHandler):
 		self._inmessage = {}
 		self.__clientID = None
 		self.__user = None
-		self.__rh = ServiceManager.get_instance().get_service('zephserver.service.roomhandler_service/RoomHandler')
-		self.__session = ServiceManager.get_instance().get_service('zephserver.service.session_service/ZephSession')
+		self.__rh = ServiceManager.get_instance().get_service(MY_ROOM_HANDLER)
+		self.__session = ServiceManager.get_instance().get_service(MY_SESSION_HANDLER)
 	
 	def check_origin(self, origin):
 		return True
@@ -103,7 +103,7 @@ class StartClientSocket(ServiceInterface):
 	_cluster = None
 	
 	def main(self):
-		self._room_handler = ServiceManager.get_instance().get_service('zephserver.service.roomhandler_service/RoomHandler')
+		self._room_handler = ServiceManager.get_instance().get_service(MY_ROOM_HANDLER)
 		self._cluster = ClusterAdapter.get_instance()
 		self._cluster.subscribe('clientsocket_send', self.say_cluster_callback)
 		logging.info('launching ClientSocketService service')
