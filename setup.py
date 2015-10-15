@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 setup(
     name='zephserver',
     packages=find_packages(),
-    version='0.1.26',
+    version='0.1.27',
     description='Python service manager that can be used as a websocket server',
     author='CDSP',
     author_email='zephserver-scpolst@sciencespo.fr',
-    url='https://github.com/CDSP/zeph',
+    url='https://github.com/CDSP/zephserver',
     keywords=['websocket', 'zeph', 'server', 'zephserver'],
     install_requires=['tornado'],
     classifiers=['Operating System :: POSIX',
