@@ -18,9 +18,7 @@ License
 '''
 
 
-import logging
-import socket
-import os
+import logging, traceback, socket, os
 from threading import Thread, Event
 
 from zephserversettings import CONFIGURATION_NETWORK_INTERFACE_SERVER
@@ -49,13 +47,19 @@ class ExternalControl(Thread):
     
 
     def run(self):
+        print('external control')
         # Trying to remove the old socket file after a nasty stop
         try:
             os.remove(CONFIGURATION_NETWORK_INTERFACE_SERVER)
         except:
             pass
-        self._main_socket = socket.socket(socket.AF_UNIX)
-        self._main_socket.bind(CONFIGURATION_NETWORK_INTERFACE_SERVER)
+        if self._is_unix_addr(CONFIGURATION_NETWORK_INTERFACE_SERVER):
+            self._main_socket = socket.socket(socket.AF_UNIX)
+            self._main_socket.bind(CONFIGURATION_NETWORK_INTERFACE_SERVER)
+        else:
+            addr, port = CONFIGURATION_NETWORK_INTERFACE_SERVER.split(':')
+            self._main_socket = socket.socket(socket.AF_INET)
+            self._main_socket.bind((addr, int(port)))
         self._main_socket.listen(1)
         while not self._stop_server:
             try:
@@ -94,8 +98,13 @@ class ExternalControl(Thread):
             logging.warning('%s', str(e))
         finally:
             self._speaking_event.set()
-            
 
+    def _is_unix_addr(self, addr):
+        # TODO better adress type detection
+        if ':' in addr: 
+            return False
+        else:
+            return True
 
     def halt_external_control(self):
         logging.warning('halt external control asked')
@@ -103,13 +112,19 @@ class ExternalControl(Thread):
         self._speaking_event.set()
         if self._main_socket != None:
             try:
-                s = socket.socket(socket.AF_UNIX)
-                s.connect(CONFIGURATION_NETWORK_INTERFACE_SERVER)
+                if self._is_unix_addr(CONFIGURATION_NETWORK_INTERFACE_SERVER):
+                    s = socket.socket(socket.AF_UNIX)
+                    s.connect(CONFIGURATION_NETWORK_INTERFACE_SERVER)
+                else:
+                    addr, port = CONFIGURATION_NETWORK_INTERFACE_SERVER.split(':')
+                    s = socket.socket(socket.AF_INET)
+                    s.connect(('127.0.0.1', int(port)))
                 s.sendall('dummy')
                 s.recv(1024)
                 s.close()
-            except:
-                pass
+            except Exception, e:
+                logging.error('%s', str(e))
+                logging.warning(traceback.format_exc())
 
     def stop(self):
         '''
