@@ -18,7 +18,7 @@ License
 '''
 
 
-import logging, importlib
+import logging, importlib, traceback
 from threading import Lock, Thread
 from zephserversettings import SERVICE_LIST
 
@@ -266,6 +266,10 @@ class ServiceContainer(Thread):
 		logging.debug('success enabeling service %s', self._service_name)
 		try:
 			self._service_instance.main()
+		except Exception, e:
+			logging.error(e)
+			logging.error(traceback.format_exc())
+
 		finally:
 			self._has_run = True
 			ServiceManager.get_instance()._manipulating_service_lock.acquire()

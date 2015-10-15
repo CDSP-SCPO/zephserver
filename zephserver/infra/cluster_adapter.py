@@ -175,7 +175,7 @@ class ClusterAdapter(Thread):
                         for server in CLUSTER_SERVER_LIST:
                             try:
                                 if server['hostname'] != self._host:
-                                    s = socket.socket(socket.AF_INET)
+                                    s = socket.socket(socket.AF_INET6)
                                     s.connect((server['address'], server['port']))
                                     try:
                                         s.sendall(json_dict)
