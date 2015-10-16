@@ -57,7 +57,6 @@ heart_beat_period = 1600
 
 PORT_ZEPH = 8080
 
-DJANGO = True
 MY_ROOM_HANDLER = 'zephserver.service.roomhandler_service/RoomHandler'
 MY_SESSION_HANDLER = 'zephserver.service.django_session_service/ZephSession'
-
+SAME_DOMAIN = True

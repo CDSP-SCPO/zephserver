@@ -51,8 +51,6 @@ class ClientSocketService(websocket.WebSocketHandler):
 	def on_message(self, message):
 		self.get_user(message)
 		self._inmessage = json.loads(message)
-		if self.__clientID is None:
-			self.__clientID = self.__user.id
 		logging.info(message)
 		self._inmessage["usersession"]= self.__user
 		if "task" in self._inmessage:

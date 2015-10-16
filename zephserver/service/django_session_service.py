@@ -31,10 +31,8 @@ import traceback
 from threading import Event
 from zephserver.infra.service_manager import ServiceManager
 from zephserver.service.service_interface import ServiceInterface
-try:
-    from zephserversettings import SAME_DOMAIN
-except: 
-    from zephserver.settings import SAME_DOMAIN
+from zephserversettings import SAME_DOMAIN
+
 
 class DecorMethod(object):
     def __init__(self, decor, instance):
@@ -121,3 +119,4 @@ class ZephSession(ServiceInterface):
                 return None
         except Exception, e:
             logging.warning("authentification failed %s with exception %s" % (user, e))
+            return None

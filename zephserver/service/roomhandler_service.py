@@ -69,24 +69,31 @@ class RoomHandler(ServiceInterface):
                 self.room_info[room] = []
         finally:
             self._add_roomuser_lock_room_info.release()     
-        nn = user.username
+        
         self._add_roomuser_lock_user_conn_id.acquire()
         try:
-            if user.id in self.user_conn_id:
-                self.user_conn_id[user.id].append(cid)
-            else:
-                self.user_conn_id[user.id] = []
-                self.user_conn_id[user.id].append(cid)
+            if user is not None:
+                if user.id in self.user_conn_id:
+                    self.user_conn_id[user.id].append(cid)
+                else:
+                    self.user_conn_id[user.id] = []
+                    self.user_conn_id[user.id].append(cid)
         finally:
             self._add_roomuser_lock_user_conn_id.release()
         self._add_roomuser_lock_client_info.acquire()
         try:
-            self.client_info[cid] = {'room': room, 'user': nn, 'uid': user.id}  # we still don't know the WS connection for this client
+            if user is not None:
+                self.client_info[cid] = {'room': room, 'user': user.username, 'uid': user.id}  # we still don't know the WS connection for this client
+            else:
+                self.client_info[cid] = {'room': room}
         finally:
             self._add_roomuser_lock_client_info.release()
         self._add_roomuser_lock_room_info.acquire()
         try:
-            self.room_info[room].append({'cid': cid, 'user': nn, 'uid': user.id})
+            if user is not None:
+                self.room_info[room].append({'cid': cid, 'user': user.username, 'uid': user.id})
+            else:
+                self.room_info[room].append({'cid': cid})
         finally:
             self._add_roomuser_lock_room_info.release()
         return cid
@@ -191,7 +198,10 @@ class RoomHandler(ServiceInterface):
         """Return a list with the usernames of the users currently connected to the specified room."""
         nir = []  # users in room
         for user in self.room_info[rn]:
-            nir.append(user['user'])
+            try:
+                nir.append(user['user'])
+            except Exception, e:
+                logging.warning('user probably none : %s', e)
         return nir
     
     def roomate_cwsconns(self, cid):
@@ -294,40 +304,49 @@ class RoomHandler(ServiceInterface):
     
     def send_join_msg(self, client_id):
         """Send a message of type 'join' to all users connected to the room where client_id is connected."""
-        username = self.client_info[client_id]['user']
-        r_cwsconns = self.roomate_cwsconns(client_id)
-        msg = {"msgtype": "join", "username": username, "data": " joined the chat room."}
-        pmessage = json.dumps(msg)
-        for conn in r_cwsconns:
-            try:
-                self._say_lock.acquire()
-                conn.write_message(pmessage)
-            except Exception, e:
-                logging.warning('send join message : %s', e)
-                logging.warning(pmessage)
-                logging.warning(traceback.format_exc())
-            finally:
-                self._say_lock.release()
+        try:
+            username = self.client_info[client_id]['user']
+            r_cwsconns = self.roomate_cwsconns(client_id)
+            msg = {"msgtype": "join", "username": username, "data": " joined the chat room."}
+            pmessage = json.dumps(msg)
+            for conn in r_cwsconns:
+                try:
+                    self._say_lock.acquire()
+                    conn.write_message(pmessage)
+                except Exception, e:
+                    logging.warning('send join message : %s', e)
+                    logging.warning(pmessage)
+                    logging.warning(traceback.format_exc())
+                finally:
+                    self._say_lock.release()
+        except Exception, e:
+            logging.warning('user is none : %s', e)
 
     @staticmethod
     def send_users_msg(conns, user_list):
         """Send a message of type 'user_list' (contains a list of usernames) to all the specified connections."""
-        msg = {"msgtype": "user_list", "data": user_list}
-        pmessage = json.dumps(msg)
-        for c in conns:
-            try:
-                c.write_message(pmessage)
-            except:
-                pass
+        try:
+            msg = {"msgtype": "user_list", "data": user_list}
+            pmessage = json.dumps(msg)
+            for c in conns:
+                try:
+                    c.write_message(pmessage)
+                except:
+                    pass
+        except Exception, e:
+            logging.warning('user is none : %s', e)
 
     @staticmethod
     def send_leave_msg(user, rconns):
         """Send a message of type 'leave', specifying the username that is leaving, to all the specified connections."""
-        msg = {"msgtype": "leave", "username": user, "data": " left the chat room."}
-        pmessage = json.dumps(msg)
-        for conn in rconns:
-            try:
-                conn.write_message(pmessage)
-            except:
-                pass
+        try:
+            msg = {"msgtype": "leave", "username": user, "data": " left the chat room."}
+            pmessage = json.dumps(msg)
+            for conn in rconns:
+                try:
+                    conn.write_message(pmessage)
+                except:
+                    pass
+        except Exception, e:
+            logging.warning('user is none : %s', e)
 
