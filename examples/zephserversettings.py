@@ -34,6 +34,7 @@ SERVICE_LIST = [
     'zephserver.service.roomhandler_service/RoomHandler',
     'zephserver.service.session_service/ZephSession',
     'zephserver.service.clientsocket_service/StartClientSocket',
+    'zephserver.service.django_session_service/ZephSession',
 ]
 
 TASKS_PATH = {
