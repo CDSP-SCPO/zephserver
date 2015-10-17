@@ -27,8 +27,6 @@ import tornado.wsgi
 from tornado import websocket
 # django settings must be called before importing models
 
-from zephserver.utils.roomhandler.roomhandler import RoomHandler
-from zephserver.utils.decorator.sessiondecorator import Djangosession
 from zephserver.infra.cluster_adapter import ClusterAdapter
 from zephserversettings import PORT_ZEPH, MY_ROOM_HANDLER, MY_SESSION_HANDLER
 
