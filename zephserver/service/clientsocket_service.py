@@ -90,10 +90,12 @@ class StartClientSocket(ServiceInterface):
 		self._cluster = ClusterAdapter.get_instance()
 		self._cluster.subscribe('clientsocket_send', self.say_cluster_callback)
 		logging.info('launching ClientSocketService service')
+		
 		application = tornado.web.Application([
-			(r"/", ClientSocketService),
+			(r"/ws", ClientSocketService),
 		], **settings)
 		http_server = tornado.httpserver.HTTPServer(application)
+
 		http_server.listen(PORT_ZEPH)
 		tornado.ioloop.IOLoop.instance().start()
 		logging.info('Tornado started')
