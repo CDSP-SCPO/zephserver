@@ -27,13 +27,13 @@ class ServiceManager(object):
 	'''
 		@sigleton
 		class managing the services and their lifecycles.
-		due to some locks protecting memory this class can be 
+		Due to some locks protecting memory, this class can be 
 		a bottleneck if you want to manage a lot of services 
 		in a small time
 
-		A service lifecycle is inspired from Apache. It is first available then it can be enabled
+		A service lifecycle is inspired from Apache. It is first available, then it can be enabled
 
-		If a service crash the servicemanager will ytry to relaunch it (same object) in an other thread
+		If a service crashes the servicemanager, it will try to relaunch it (same object) in an other thread
 	'''
 
 	_instance = None
@@ -49,9 +49,9 @@ class ServiceManager(object):
 
 	def __init__(self):
 		'''
-			private constructor, do not use
+			private constructor, do not use it
 		'''
-		logging.info('instatiating service_manager')
+		logging.info('Instatiating service_manager')
 		pass
 
 
@@ -72,18 +72,18 @@ class ServiceManager(object):
 	
 	def enable_service(self, service_name):
 		'''
-			Method enabeling a service whitch is already avaiable
+			Method enabling a service whitch is already avaiable
 
-			Enabeling a service means launching its thread (calling its main method)
+			Enabling a service means launching its threads (calling its main method)
 
-			this method return True if the service has been enabled and False otherwise
+			this method returns True if the service has been enabled, False otherwise
 		'''
 		if self._services_available.has_key(service_name) and not self._services_enable.has_key(service_name) and self._pending_stop == False:
 			self._manipulating_service_lock.acquire()
 			try:
 				service = None
 				if self._services_available.has_key(service_name) and not self._services_enable.has_key(service_name) and self._pending_stop == False:
-					logging.debug('enabeling service %s', service_name)
+					logging.debug('Enabling service %s', service_name)
 					service = self._services_available[service_name]
 					service.get_service_lock().acquire()
 					if service.has_run():
@@ -97,81 +97,80 @@ class ServiceManager(object):
 				self._manipulating_service_lock.release()
 				return True
 		else:
-			logging.warning('fail enabeling service %s', service_name)
+			logging.warning('Failed enabling service %s', service_name)
 			return False
 			
 
 
 	def enable_all_services(self):
 		'''
-			Method enabeling all services available
+			Method enabling all services available
 		'''
-		logging.debug('enabelling all services')
+		logging.debug('Enabling all services')
 		output = True
 		for service in self._services_available:
 			if not self.enable_service(service):
 				output = False
-		logging.debug('enabelling all servicies... done')
+		logging.debug('Enabling all services... done')
 		return output
 
 
 	def disable_service(self, service_name):
 		'''
-			function disableing (killing threads) all services enabled
+			function disabling (killing threads) all services enabled
 		'''
-		logging.debug('disabelling %s', service_name)
+		logging.debug('Disabling %s', service_name)
 		service = self._services_enable.get(service_name, None)
 		if not service == None:
 			service.disable()
 			service.join()
-			logging.debug('disabelling %s done', service_name)
+			logging.debug('Disabling %s done', service_name)
 			return True	
 		else:
-			logging.warning('disabelling %s fail', service_name)
+			logging.warning('Disabling %s fail', service_name)
 			return False
 
 
 	def disable_all_services(self):
 		'''
-			Fonction desactivant tout les services
-			fonction retourne True si tout les services ont ete lance et false sinon
+			function deactivating all services.
+			function returns True if all services have been launched, False otherwise
 		'''
-		logging.debug('disabelling all services')
+		logging.debug('Disabling all services')
 		output = True
 		services = self._services_enable.copy()
 		for service in services:
 			if not self.disable_service(service):
 				output = False
-		logging.debug('disabelling all services... done')
+		logging.debug('Disabling all services... done')
 		return output
 
 
 
 	def create_service(self, service_name, service_instance):
 		'''
-			Fonction inscrivant un service parmis ceux disponibles pour etre demare
-			la function retourne True si on l'a inscrit et False sinon
+			function registering a service among all available in order to be launched
+			function returns True if it has been registered, False if not
 		'''
-		logging.debug('creating %s', service_name)
+		logging.debug('Creating %s', service_name)
 		if not self._services_available.has_key(service_name):
 			self._manipulating_service_lock.acquire()
 			if not self._services_available.has_key(service_name):
 				self._services_available[service_name] = ServiceContainer(service_name,service_instance)
 			self._manipulating_service_lock.release()
-			logging.debug('creating %s ... done', service_name)
+			logging.debug('Creating %s ... done', service_name)
 			return True
 		else:
-			logging.warning('creating %s ... fail', service_name)
+			logging.warning('Creating %s ... fail', service_name)
 			return False
 
 	def create_all_service(self, enable_all=False):
 		'''
-			méthode instatiant dynamiquement tout les services presant dans 
-			la variable services_liste de configs.py
+			method instanciating dynamically all services in the variable named "SERVICE_LIST", in configs.py
 		'''
-		logging.info('instanciating all services')
+		logging.info('Instanciating all services')
 		for path in SERVICE_LIST:
-			logging.debug('importing service : %s', path)
+			logging.debug('Importing service : %s', path)
 			module = importlib.import_module(path.split('/')[0])
 			class_def = getattr(module, path.split('/')[-1])()
 			self.create_service(path, class_def)
@@ -180,60 +179,60 @@ class ServiceManager(object):
 
 	def delete_service(self, service_name):
 		'''
-			fonction desinscrivant un service le rendant innacessible
-			la fonction retourne True si le service est trouve et desinscrit et False sinon
+		function unsubscribing a service, rendering it unavailable
+		function returns True if the service is found
 		'''
-		logging.debug('deleting %s', service_name)
+		logging.debug('Deleting %s', service_name)
 		if self._services_available.has_key(service_name):
 			self._manipulating_service_lock.acquire()
 			if self._services_available.has_key(service_name):
 				del self._services_available[service_name]
 			self._manipulating_service_lock.release()
-			logging.debug('deleting %s ... done', service_name)
+			logging.debug('Deleting %s ... done', service_name)
 			return True
 		else:
-			logging.warning('deleting %s ... fail', service_name)
+			logging.warning('Deleting %s ... fail', service_name)
 			return False
 
 
 	def delete_all_services(self):
 		'''
-			Fonction detruisant tout les services
-			fonction retourne True si tout les services ont ete detruits et false sinon
+			funtion deleting all services
+			function returns True if services has been deleted, False if not
 		'''
-		logging.debug('deleting all services')
+		logging.debug('Deleting all services')
 		output = True
 		services = self._services_available.copy()
 		for service in services:
 			if not self.delete_service(service):
 				output = False
-		logging.debug('deleting all services...done')
+		logging.debug('Deleting all services...done')
 		return output
 
 
 	def get_service(self, service_name):
 		'''
-			Fonction retournant le service demande si il existe et le lançant si besoin
-			la fonction retourne None si le service n'est pas trouve
+			function returning the asked service if it exists and launching it if needed
+			function returns None is service wasn't found
 		'''
-		logging.debug('getting service %s',service_name)
+		logging.debug('Getting service %s',service_name)
 		if self._services_enable.has_key(service_name):
 			return self._services_enable[service_name].get_service()
 		elif self._pending_stop == True:
-			logging.warning('service %s not found and stop pendding',service_name)
+			logging.warning('Service %s not found and stop pendding',service_name)
 			return None
 		elif self._services_available.has_key(service_name):
 			if not self.enable_service(service_name):
-				logging.warning('service %s found but disable',service_name)
+				logging.warning('Service %s found but disable',service_name)
 				return None
 			return self._services_enable[service_name].get_service()
 		else:
-			logging.warning('service %s not found !', service_name)
+			logging.warning('Service %s not found !', service_name)
 			return None
 
 	def stop_service_manager(self):
 		'''
-			Fonction éteignant proprement les services
+			function stopping properly all services
 		'''
 		logging.info('Stopping service_manager')
 		self._pending_stop = True
@@ -243,13 +242,13 @@ class ServiceManager(object):
 		self._instance = None
 		self._instance_lock.release()
 		self._pending_stop = False
-		logging.info('servicemanager stopped')
+		logging.info('Servicemanager has stopped')
 
 
 
 class ServiceContainer(Thread):
 	'''
-		calsse privé permetant de gérer plus finement les cycle de vie en se recréant pour relancé un service éteint.
+		private class allowing you to manage more finely life cycles, re-creating itself in order to re-launch turned-off services
 	'''
 	_service_name = ''
 	_service_instance = ''
@@ -265,7 +264,7 @@ class ServiceContainer(Thread):
 	def run(self):
 		ServiceManager.get_instance()._services_enable[self._service_name] = self
 		self._service_lock.release()
-		logging.debug('success enabeling service %s', self._service_name)
+		logging.debug('Success enabeling service %s', self._service_name)
 		try:
 			self._service_instance.main()
 		except Exception, e:
@@ -282,38 +281,38 @@ class ServiceContainer(Thread):
 
 	def disable(self):
 		'''
-			transmet le signal de mort
+			transmit the death signal
 		'''
 		self._service_instance.disable()
 
 	def get_service_lock(self):
 		'''
-			access the lock of the this ServiceContainer
+			give the ServiceContainer's lock
 		'''
 		return self._service_lock
 
 
 	def get_service(self):
 		'''
-			interace pour être transparent hors du gestionnaire de services
+			interface allowing you to leave no traces out of the service_manager
 		'''
 		return self._service_instance
 
 	def has_run(self):
 		'''
-			encapsumation de la variable self._has_run
+			encapsulation of the variable "self._has_run"
 		'''
 		return self._has_run
 
 	def restart(self):
 		'''
-			methode permetant de contourner la  limitation a un démarage par 
-			thread en recréant un thread si un demarage est demandé et que le 
-			thread a deja été demaré une fois
+			method allowing you to ignore the "one start per thread"limitation, 
+			re-creating a thread if a start is asked et the thread has already 
+			started once
 
-			cette methode est tres prive et ne doit être apelle qua dans la 
-			fonction de démarage de service ServiceManager.enable_service sous
-			peine de comportements non définis
+			this is a private method and should be called ONLY in your service 
+			starting function "ServiceManager.enable_service", under penalty of 
+			having undefined behaviors
 		'''
 		#_services_available
 		service_manager = ServiceManager.get_instance()
