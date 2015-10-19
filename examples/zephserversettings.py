@@ -36,7 +36,7 @@ SERVICE_LIST = [
     'zephserver.service.db_service/DbService',
     'zephserver.service.routeur_service/RouteurService',
     'zephserver.service.roomhandler_service/RoomHandler',
-    'zephserver.service.clientsocket_service/StartClientSocket',
+    'zephserver.service.socket_service/StartSocket',
     'zephserver.service.django_session_service/ZephSession',
 ]
 

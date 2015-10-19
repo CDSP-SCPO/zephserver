@@ -33,7 +33,7 @@ from zephserversettings import PORT_ZEPH, MY_ROOM_HANDLER, MY_SESSION_HANDLER
 from zephserver.infra.service_manager import ServiceManager
 from zephserver.service.service_interface import ServiceInterface
 
-class ClientSocketService(websocket.WebSocketHandler):
+class SocketService(websocket.WebSocketHandler):
 		
 	def initialize(self):
 		"""Store a reference to the "external" RoomHandler instance"""
@@ -80,7 +80,7 @@ settings = {
 	} 
 # map the Urls to the class		  
 
-class StartClientSocket(ServiceInterface):
+class StartSocket(ServiceInterface):
 	
 	_room_handler = None
 	_cluster = None
@@ -89,10 +89,10 @@ class StartClientSocket(ServiceInterface):
 		self._room_handler = ServiceManager.get_instance().get_service(MY_ROOM_HANDLER)
 		self._cluster = ClusterAdapter.get_instance()
 		self._cluster.subscribe('clientsocket_send', self.say_cluster_callback)
-		logging.info('launching ClientSocketService service')
+		logging.info('launching SocketService service')
 		
 		application = tornado.web.Application([
-			(r"/ws", ClientSocketService),
+			(r"/ws", SocketService),
 		], **settings)
 		http_server = tornado.httpserver.HTTPServer(application)
 
