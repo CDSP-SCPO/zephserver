@@ -26,9 +26,9 @@ LOG_PATH = './logs.log'
 #fichier a utiliser sous unix pour communiquer entre l'utilitaire en ligne de commande et le serveur
 CONFIGURATION_NETWORK_INTERFACE='./interface.sock'
 CONFIGURATION_NETWORK_INTERFACE_SERVER = './interface.sock'
-#for windows :
-CONFIGURATION_NETWORK_INTERFACE='127.0.0.1:12345'
-CONFIGURATION_NETWORK_INTERFACE_SERVER = '127.0.0.1:12345'
+#we do not support windows but here is the conf for windows :
+#CONFIGURATION_NETWORK_INTERFACE='127.0.0.1:12345'
+#CONFIGURATION_NETWORK_INTERFACE_SERVER = '127.0.0.1:12345'
 
 
 #liste des services a activer
