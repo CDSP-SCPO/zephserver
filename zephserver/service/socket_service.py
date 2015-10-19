@@ -116,6 +116,6 @@ class StartSocket(ServiceInterface):
 		self.say(cluster_data['data'], True)
 	
 	def disable(self):
-		logging.warning('asking to stop ClientSocketService service')
+		logging.warning('Asking to stop ClientSocketService service')
 		tornado.ioloop.IOLoop.instance().stop()
-		logging.info('Tornado stoped')
+		logging.info('Tornado stopped')

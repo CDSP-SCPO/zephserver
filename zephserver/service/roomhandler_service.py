@@ -26,15 +26,17 @@ from threading import Lock, Event
 from zephserver.service.service_interface import ServiceInterface
 
 class RoomHandler(ServiceInterface):
-    """Store data about connections, rooms, which users are in which rooms, etc."""
+    """
+        Store data about connections, rooms, in which rooms are users, etc ...
+    """
     
     _shutdown_event = Event()
     
     def __init__(self):
         self.val = None
-        self.client_info = {}  # for each client id we'll store  {'wsconn': wsconn, 'room':room, 'user':username}
-        self.room_info = {}  # dict  to store a list of  {'cid':cid, 'user':username, 'wsconn': wsconn} for each room
-        self.roomates = {}  # store all connection from a room
+        self.client_info = {}  # for each client id, we will store : {'wsconn': wsconn, 'room':room, 'user':username}
+        self.room_info = {}  # dict to store a list of  {'cid':cid, 'user':username, 'wsconn': wsconn} for each room
+        self.roomates = {}  # store all connections from a room
         self.user_conn_id = {}  # store a list of connection for a unique user id
         self.all_conn = [] # store all connection 
         self._add_roomuser_lock_client_info = Lock()
@@ -48,17 +50,19 @@ class RoomHandler(ServiceInterface):
         return 'self ' + self
     
     def main(self):
-        logging.info('launching room handler service')
+        logging.info('Launching room handler service')
         self._shutdown_event.wait()
         self._shutdown_event.clear()
         
     def disable(self):
-        logging.warning('asking to stop room handler service')
+        logging.warning('Asking to stop room handler service')
         self._shutdown_event.set()
-        logging.info('room handler service stoped')
+        logging.info('Room handler service stoped')
         
     def add_roomuser(self, message, user):
-        """Add user to room. Return clientID"""
+        """
+            Add user to room. Return clientID
+        """
         # meant to be called from the main handler (page where somebody indicates a username and a room to join)
         cid = uuid.uuid4().hex  # generate a connection id.
         decodemessage = json.loads(message)
@@ -99,7 +103,9 @@ class RoomHandler(ServiceInterface):
         return cid
         
     def add_client_wsconn(self, client_id, conn):
-        """Store the websocket connection corresponding to an existing client."""
+        """
+            Store the websocket connection corresponding to an existing client.
+        """
         self._add_roomuser_lock_all_conn.acquire()
         try:
             self.all_conn.append(conn)
@@ -134,7 +140,9 @@ class RoomHandler(ServiceInterface):
         self.send_users_msg(cwsconns, user_list)    
         
     def remove_client(self, cid):
-        """Remove all client information from the room handler."""
+        """
+            Remove all client information from the room handler.
+        """
     
         self._add_roomuser_lock_client_info.acquire()
         try:
@@ -195,18 +203,23 @@ class RoomHandler(ServiceInterface):
             self._add_roomuser_lock_room_info.release()    
                 
     def users_in_room(self, rn):
-        """Return a list with the usernames of the users currently connected to the specified room."""
+        """
+            Return a list with the usernames of the users currently connected to the specified room.
+        """
+        
         nir = []  # users in room
         for user in self.room_info[rn]:
             try:
                 nir.append(user['user'])
             except Exception, e:
-                logging.warning('user probably none : %s', e)
+                logging.warning('User is probably "none" : %s', e)
         return nir
     
     def roomate_cwsconns(self, cid):
-        """Return a list with the connections of the users currently connected to the room where
-        the specified client (cid) is connected."""
+        """
+            Return a list with the connections of the users currently connected to the room where
+        the specified client (cid) is connected.
+        """
         cid_room = self.client_info[cid]['room']
         r = {}
         self._add_roomuser_lock_roomates.acquire()
@@ -218,8 +231,10 @@ class RoomHandler(ServiceInterface):
             self._add_roomuser_lock_roomates.release() 
         
     def send_to_room(self, room, pmessage):
-        """Return a list with the connections of the users currently connected to the room where
-        the specified client (cid) is connected."""
+        """
+            Return a list with the connections of the users currently connected to the room where
+        the specified client (cid) is connected.
+        """
         response = {}
         response["data"] = pmessage["data"]
         response["task"] = pmessage["task"]
@@ -244,8 +259,10 @@ class RoomHandler(ServiceInterface):
             self._add_roomuser_lock_roomates.release() 
              
     def send_to_users(self, user, pmessage):
-        """Return a list with the connections of the users currently connected to the room where
-        the specified client (cid) is connected."""
+        """
+            Return a list with the connections of the users currently connected to the room where
+        the specified client (cid) is connected.
+        """
         response = {}
         response["data"] = pmessage["data"]
         response["task"] = pmessage["task"]
@@ -267,8 +284,10 @@ class RoomHandler(ServiceInterface):
                 logging.info('user %s not found', u)
     
     def send_to_all(self, pmessage):
-        """Return a list with the connections of the users currently connected to the room where
-        the specified client (cid) is connected."""
+        """
+            Return a list with the connections of the users currently connected to the room where
+        the specified client (cid) is connected.
+        """
         response = {}
         response["data"] = pmessage["data"]
         response["task"] = pmessage["task"]
@@ -285,8 +304,10 @@ class RoomHandler(ServiceInterface):
                 self._say_lock.release()
              
     def send_to_cid(self, cid, pmessage):
-        """Return a list with the connections of the users currently connected to the room where
-        the specified client (cid) is connected."""
+        """
+            Return a list with the connections of the users currently connected to the room where
+        the specified client (cid) is connected.
+        """
         response = {}
         response["data"] = pmessage["data"]
         response["task"] = pmessage["task"]
@@ -303,7 +324,9 @@ class RoomHandler(ServiceInterface):
 
     
     def send_join_msg(self, client_id):
-        """Send a message of type 'join' to all users connected to the room where client_id is connected."""
+        """
+            Send a message of type 'join' to all users connected to the room where client_id is connected.
+        """
         try:
             username = self.client_info[client_id]['user']
             r_cwsconns = self.roomate_cwsconns(client_id)
@@ -324,7 +347,10 @@ class RoomHandler(ServiceInterface):
 
     @staticmethod
     def send_users_msg(conns, user_list):
-        """Send a message of type 'user_list' (contains a list of usernames) to all the specified connections."""
+        """
+            Send a message of type 'user_list' (contains a list of usernames) to all the specified connections.
+        """
+        
         try:
             msg = {"msgtype": "user_list", "data": user_list}
             pmessage = json.dumps(msg)
@@ -334,11 +360,14 @@ class RoomHandler(ServiceInterface):
                 except:
                     pass
         except Exception, e:
-            logging.warning('user is none : %s', e)
+            logging.warning('User is "none" : %s', e)
 
     @staticmethod
     def send_leave_msg(user, rconns):
-        """Send a message of type 'leave', specifying the username that is leaving, to all the specified connections."""
+        """
+            Send a message of type 'leave', specifying the username that is leaving, to all the specified connections.
+        """
+        
         try:
             msg = {"msgtype": "leave", "username": user, "data": " left the chat room."}
             pmessage = json.dumps(msg)

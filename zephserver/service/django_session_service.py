@@ -53,17 +53,17 @@ class ZephSession(ServiceInterface):
     _shutdown_event = Event()
     
     def main(self):
-        logging.info('launching session service')
+        logging.info('Launching session service')
         self._shutdown_event.wait()
         self._shutdown_event.clear()
         
     def disable(self):
-        logging.warning('asking to stop session service')
+        logging.warning('Asking to stop session service')
         self._shutdown_event.set()
-        logging.info('session service stoped')
+        logging.info('Session service stoped')
         
     def get_django_session(self, instance, message):
-        logging.info('message %s' ,message)
+        logging.info('Message %s' ,message)
         message_content = json.loads(message)
         logging.info(message_content)
         try:
@@ -80,7 +80,7 @@ class ZephSession(ServiceInterface):
             exc_type, exc_value, exc_traceback = sys.exc_info()
             logging.error(traceback.format_exception(exc_type, exc_value, exc_traceback))
         self._session = engine.SessionStore(session_key)
-        logging.info('session %s'% self._session)
+        logging.info('Session %s'% self._session)
         return self._session
       
     def get_current_user(self, instance, message):
@@ -91,10 +91,10 @@ class ZephSession(ServiceInterface):
             #on essaye de se recuperer la session
             django_request.session = self.get_django_session(instance, message)
             user = django.contrib.auth.get_user(django_request)
-            logging.info('user session %s'% user.id)
+            logging.info('User session %s'% user.id)
         except:
             # en cas d'echec on reset la connexion a la db
-            logging.info('db connection failed, trying reseting db')
+            logging.info('Database connection failed, trying to reset database')
             sm = ServiceManager.get_instance()
             db_service = sm.get_service('zephserver.service.db_service/DbService')
             db_service.reset_db()
@@ -118,5 +118,5 @@ class ZephSession(ServiceInterface):
                     return user
                 return None
         except Exception, e:
-            logging.warning("authentification failed %s with exception %s" % (user, e))
+            logging.warning("Authentification failed %s with exception %s" % (user, e))
             return None

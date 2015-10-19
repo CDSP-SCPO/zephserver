@@ -26,13 +26,10 @@ from zephserversettings import TASKS_PATH
 
 class RouteurService(ServiceInterface):
 	'''
-		Service gerant le lancement et l'execution de tache. 
-		Il gere aussi le cycle de vie des tache a travers la classe 
-		TaskContainer plus bas dans le fichier.
-		La seule methode devant être apelle par un autre service ou une tache
-		est la methode "route".
-		Les autres methodes publiques sont reservé a l'usage du service manager
-		et du task container
+		Service managing the launch and execution of tasks.
+		It manages life cycle of tasks through the class named "TaskContainer" (lower in this file)
+		The only method that should be called by an other service or a task is the "route" method.
+		The others public methods are dedicated to the service managerand the task container
 	'''
 	
 	_shutdown_event = Event()
@@ -43,27 +40,27 @@ class RouteurService(ServiceInterface):
 	_pending_stop = False
 
 	def __init__(self):
-		logging.info('instanciating routeur service')
+		logging.info('Instanciating routeur service')
 
 	def main(self):
-		logging.info('launching routeur service')
+		logging.info('Launching routeur service')
 		self._shutdown_event.wait()
 		self._shutdown_event.clear()
 
 	def disable(self):
 		'''
-			methode d'extinction du service
+			Service disabling method
 		'''
-		logging.warning('asking to stop routeur service')
+		logging.warning('Asking to stop routeur service')
 		self._pending_stop = True
 		self._stop_all_task()
 		self._shutdown_event.set()
-		logging.info('routeur service stoped')
+		logging.info('Router service stopped')
 
 	
 	def enrole_task(self, task_container):
 		'''
-			inscrit une tache comme en cours d'execution
+			register a task as "executing"
 		'''
 		try:
 			self._manipulating_task_lock.acquire()
@@ -77,7 +74,7 @@ class RouteurService(ServiceInterface):
 
 	def remove_task(self, task):
 		'''
-			desinscrit une tache comme en cour d'execution
+			unregister a task as "executing"
 		'''
 		try:
 			self._manipulating_task_lock.acquire()
@@ -92,9 +89,9 @@ class RouteurService(ServiceInterface):
 
 	def _stop_all_task(self):
 		'''
-			interompt toutes les taches
+			stop all tasks
 		'''
-		logging.info('starting to stop all tasks')
+		logging.info('Starting to stop all tasks')
 		self._pending_delete_all = True
 		while len(self._task_list) > 0:
 			try:
@@ -116,10 +113,9 @@ class RouteurService(ServiceInterface):
 
 	def route(self, request):
 		'''
-			principale methode d'api permetant a n'importe qui 
-			de demander le lancement d'une tache en lui 
-			fournissant un dictionnaire request standardise
-			la methode retourne True si tout s'est bien passe et False sinon
+			main api method allowing anyone to ask a task launch, providing a 
+			dictionnary of standardised requests
+			method return True if everything is fine, False if not
 		'''
 		try:
 			if request != None and self._pending_delete_all == False and self._pending_stop == False:
@@ -134,7 +130,9 @@ class RouteurService(ServiceInterface):
 
 
 class TaskContainer(Thread):
-	"""classe privée servant a encapsuller les tache et a gerer leur cycle de vie"""
+	"""
+		private class allowing to encapsulate taks and manage their life cycle
+	"""
 
 	#instance du taskmanager passe au constructeur pour eviter de repasser par le service manager a chaque fois
 	_task_manager = None
@@ -163,7 +161,7 @@ class TaskContainer(Thread):
 		splited_path = task_path.split('/')
 		#si le chemin n'est aps consitue de deux strings separe par un symbole / on quite
 		if len(splited_path) != 2 :
-			logging.warning('error %s is not a valide path', task_path)
+			logging.warning('Error %s is not a valide path', task_path)
 			self.task_manager.remove_task(self)
 			return
 		#on lance la tache dans un try except au cas ou (par exemple si le chemin est vers une classe qui n'existe pas ou si la tache crash)
@@ -187,16 +185,19 @@ class TaskContainer(Thread):
 			
 	def _get_task_path(self):
 		'''
-			methode retournant le chemin vers la tache depuis le fichier routeur.py si il le trouve et None sinon
+			method returning the path to the task from the file routeur.py if founded, None if not
 		'''
 		if TASKS_PATH.has_key(self._request['task']):
-			logging.debug('task %s found as %s', self._request['task'], TASKS_PATH[self._request['task']])
+			logging.debug('Task %s found as %s', self._request['task'], TASKS_PATH[self._request['task']])
 			return TASKS_PATH[self._request['task']]
 		else:
-			logging.warning('task %s not found!', self._request['task'])
+			logging.warning('Task %s not found!', self._request['task'])
 			return None
 
 
 	def interrupt(self):
-		'''methodepropageant la demande d'interruption a la tache execute'''
+		'''
+			method propagating the interruption demand to the executed task
+		'''
+		
 		self._task.interrupt()
