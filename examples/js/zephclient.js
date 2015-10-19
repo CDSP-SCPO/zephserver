@@ -41,7 +41,7 @@ function Zephclient(session, url, room, messageCallback){
 	*/
 	self.defaultCallBack = function(event)
 	{
-		data = JSON.parse(event.data);
+		var data = JSON.parse(event.data);
 		if(self.callbackTable[data.task] != undefined)
 		{
 			for(var i = 0; i < self.callbackTable[data.task].length; i++)
