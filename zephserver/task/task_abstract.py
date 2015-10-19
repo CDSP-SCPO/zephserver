@@ -30,14 +30,14 @@ class TaskAbstract(TaskInterface):
 
 	def run(self):
 		'''
-			methode principale du thread
+			main thread method
 		'''
 		pass
 
 	def interrupt(self):
 		'''
-			methode demandant la mise a mort de la tache
-			elle doit s'executer vite
+			method asking the task's death
+			has to run fast (the method !)
 		'''
 		pass
 		

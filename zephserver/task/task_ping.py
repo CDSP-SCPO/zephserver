@@ -23,7 +23,7 @@ from zephserver.task.task_interface import TaskInterface
 
 class TaskPing(TaskInterface):
 	'''
-		task permetant de garder la connexion websocket ouverte
+		task allowing to keep the websocket connection open
 	'''
 	_pending_stop = False
 
@@ -35,7 +35,7 @@ class TaskPing(TaskInterface):
 
 	def main(self):
 		'''
-			methode principale du thread
+			thread's main method
 		'''
 		#do nothing
 		pass
@@ -43,7 +43,7 @@ class TaskPing(TaskInterface):
 
 	def interrupt(self):
 		'''
-			methode demandant la mise a mort de la tache
-			elle doit s'executer vite
+			method asking the task's death
+			has to run fast (the method !)
 		'''
 		self._pending_stop = True
