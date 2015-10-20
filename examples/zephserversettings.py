@@ -30,6 +30,9 @@ CONFIGURATION_NETWORK_INTERFACE_SERVER = './interface.sock'
 #CONFIGURATION_NETWORK_INTERFACE='127.0.0.1:12345'
 #CONFIGURATION_NETWORK_INTERFACE_SERVER = '127.0.0.1:12345'
 
+#to define your own services :
+MY_ROOM_HANDLER = 'zephserver.service.roomhandler_service/RoomHandler'
+MY_SESSION_HANDLER = 'zephserver.service.django_session_service/ZephSession'
 
 #liste des services a activer
 SERVICE_LIST = [
@@ -61,6 +64,5 @@ heart_beat_period = 1600
 
 PORT_ZEPH = 8080
 
-MY_ROOM_HANDLER = 'zephserver.service.roomhandler_service/RoomHandler'
-MY_SESSION_HANDLER = 'zephserver.service.django_session_service/ZephSession'
+
 SAME_DOMAIN = True
