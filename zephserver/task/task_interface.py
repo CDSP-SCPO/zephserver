@@ -20,9 +20,10 @@ License
 
 class TaskInterface(object):
 	'''
-		interface a respecter pour faire une tache.
-		la methode interupt DOIT s'eteindre relativement vite pour l'arret du serveur quand la methode interrupt est apellé
-		main remplace la methode run
+		task's model
+		the interupt method HAS TO turn off fast for the server 
+		shut down when the method "interrupt" is called
+		main replaces the "run" method
 	'''
 	_request = None
 	def __init__(self, request):
@@ -31,14 +32,14 @@ class TaskInterface(object):
 
 	def main(self):
 		'''
-			methode principale du thread
+			main thread's method
 		'''
 		pass
 
 
 	def interrupt(self):
 		'''
-			methode demandant la mise a mort de la tache
-			elle doit s'executer vite
+			method asking task's death
+			has to run fast (the method !)
 		'''
 		pass

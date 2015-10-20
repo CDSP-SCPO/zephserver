@@ -24,15 +24,15 @@ from zephserversettings import CLUSTER_SERVER_LIST
 class ClusterAdapter(Thread):
     '''
         Singleton class managing the cluster communication. The message will be serialized
-        in JSON and sended to the cluster via the network. 
+        in JSON and sent to the cluster via the network. 
 
-        If the message is too long it will be slices in smaller messages by 
+        If the message is too long, it will be sliced in smaller messages by 
         sender and rebuilt by receiver 
 
-        If the CLUSTER_SERVER_LIST variable in the configuration file est shorter than two
-        elements, the cluster will act like if there is an actual cluster of server but it 
-        will do nothing. This behavior is made to permet all the aplication to work the same
-        way with or without cluster
+        If the CLUSTER_SERVER_LIST variable in the configuration file is shorter than two
+        elements, the cluster will act like if there is an actual cluster of server, but it 
+        will do nothing. This behavior is made to allow to all the aplications to work the same
+        way, with or without cluster
     '''
 
     _instance = None
@@ -113,7 +113,7 @@ class ClusterAdapter(Thread):
 
     def _execute(self, data):
         '''
-            Method calling the surscribers to the event launched by an other 
+            Method calling the subscribers to the event launched by an other 
             member of the cluster
         '''
         try:
@@ -125,10 +125,10 @@ class ClusterAdapter(Thread):
                         try:
                             subscriber(clear_data)
                         except Exception, e:
-                            logging.warning('cannot execute subscriber error %s', str(e))
+                            logging.warning('Cannot execute subscriber error %s', str(e))
 
         except:
-            logging.warning('execution failed data : %s', data)
+            logging.warning('Execution failed data : %s', data)
 
 
     def subscribe(self, event, callback):
@@ -155,7 +155,7 @@ class ClusterAdapter(Thread):
             build the json and send it to the whole cluster
 
             event : string : name of the event to call
-            data : dict : data to pass to the subscriber on the other servers. 
+            data : dict : data to pass to the subscriber on the others servers. 
                           Must be json serializable
         '''
         if len(CLUSTER_SERVER_LIST) > 1:
@@ -189,10 +189,10 @@ class ClusterAdapter(Thread):
                                     finally:
                                         s.close()
                             except Exception, e:
-                                logging.warning('cluster communication with ' + server['hostname'] + 'failed %s', e)
+                                logging.warning('Cluster communication with ' + server['hostname'] + 'failed %s', e)
 
             except Exception, e:
-                logging.warning('cluster communication failed %s', e)
+                logging.warning('Cluster communication failed %s', e)
         else:
             pass
 
@@ -200,7 +200,7 @@ class ClusterAdapter(Thread):
         '''
             shut down the cluster adapter
         '''
-        logging.warn('shutdown cluster module asked')
+        logging.warn('Shutdown cluster module asked')
         if len(CLUSTER_SERVER_LIST) > 1:
             try:
                 self._stop_service =  True
@@ -210,7 +210,7 @@ class ClusterAdapter(Thread):
                 s.recv(1024)
                 s.close()
             except Exception, e:
-                logging.error('shutdown cluster module failed because : %s', e)
+                logging.error('Shutdown cluster module failed because : %s', e)
         else:
             self._stop_event.set()
 
@@ -223,11 +223,11 @@ class ClusterAdapter(Thread):
 
 class _BigMessageHandler(object):
     '''
-        private class managing big message by slicing them in small chunks 
-        (less than 3500 bytes) and rebuilding the whole json when receiving 
-        sliced message
+        private class managing big messages by slicing them in small chunks 
+        (less than 3500 bytes) and re-building the whole json when receiving 
+        sliced messages
 
-        warning not tested nor used
+        warning : not tested nor used
     '''
     _message_dict = {}
     _cluster_adapter = None

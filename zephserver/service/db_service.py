@@ -26,29 +26,29 @@ from zephserver.service.service_interface import ServiceInterface
 
 class DbService(ServiceInterface):
 	'''
-		service gerant l'acces a la base de donnee et le cycle de vie des connexions a la bdd
-		(pour l'instant il delegue a django)
+		service managing the database access and the life cycle of database's 
+		connections (for now, django is handling this)
 	'''
 	
 	_shutdown_event = Event()
 
 	def __init__(self):
-		logging.info('instanciating db service')
+		logging.info('Instanciating db service')
 
 	def main(self):
-		logging.info('launching db service')
+		logging.info('Launching db service')
 		self._shutdown_event.wait()
 		self._shutdown_event.clear()
 
 	def reset_db(self):
 		from django import db
-		logging.info('closing db')
+		logging.info('Closing db')
 		connection.close()
 		
 	def disable(self):
-		logging.warning('asking to stop db service')
+		logging.warning('Asking to stop db service')
 		self._shutdown_event.set()
-		logging.info('db service stoped')
+		logging.info('Database service stopped')
 
 	def get_cursor(self):
 		return connection.cursor()

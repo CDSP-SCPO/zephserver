@@ -33,8 +33,7 @@ class Bootstrap:
 
     _stop_event = Event()
     _external_control = None
-    _is_testing = False  # variabel changeant legerement la cinematique du bootstrap pour faire passer les TU
-
+    _is_testing = False  # variables slightly chaging bootstrap's animation in order to pass unit tests
 
     def __init__(self, argv=None):
         self._argv = argv
@@ -45,19 +44,19 @@ class Bootstrap:
         '''
         self._set_logger()
         if self._is_server_started():
-            print('\nserver alrady started if not remove the lock(if you are running the test this message is normal)')
-            logging.error('server alrady started if not remove the lock')
+            print('\nServer alrady started. If not, remove the lock (if you are running the test, this message is normal)')
+            logging.error('Server alrady started. If not, remove the lock')
             return 1
         else:
             self._lock_instance()
-            logging.info('starting server')
+            logging.info('Starting server')
             cluster_adapter = ClusterAdapter.get_instance()
             cluster_adapter.start()
             service_manager = ServiceManager.get_instance()
             service_manager.create_all_service(True)
             self._external_control = ExternalControl(self)
             self._external_control.start()
-            logging.info('server started')
+            logging.info('Server started')
             if self._is_testing:
                 pass
             else :
@@ -69,16 +68,16 @@ class Bootstrap:
 
     def command_stop(self):
         '''
-            ask the server to stop
+            ask to the server to stop
         '''
         self._stop_event.set()
 
 
     def stop_server(self):
         '''
-            stoping sequence of the server
+            stop server's sequence
         '''
-        logging.info('halting server requested')
+        logging.info('Halting server requested')
         service_manager = ServiceManager.get_instance()
         service_manager.stop_service_manager()
         self._external_control.halt_external_control()
@@ -87,13 +86,13 @@ class Bootstrap:
         cluster_adapter.disable()
         cluster_adapter.join()
         self._release_instace()
-        logging.info('halting server done')
+        logging.info('Halting server done')
 
 
 
     def _set_logger(self, log_level=LOG_LEVEL, log_path=LOG_PATH):
         '''
-            private method for handeling log level anf log path
+            private method for handeling log level and log path
             default log level is INFO
             default log path is ./logging.log
         '''
@@ -120,7 +119,7 @@ class Bootstrap:
 
     def _is_server_started(self):
         '''
-            return true if a server is started and false otherwise
+            return true if a server is started, false otherwise
             the other instance of the server is detected via a lock file
         '''
         return os.path.isfile(LOCK_FILE)

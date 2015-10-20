@@ -101,4 +101,4 @@ class StartSocket(ServiceInterface):
 	def disable(self):
 		logging.warning('asking to stop SocketService service')
 		tornado.ioloop.IOLoop.instance().stop()
-		logging.info('Tornado stoped')
+		logging.info('Tornado stopped')

@@ -22,7 +22,7 @@ License
 class ServiceInterface(object):
 
 	def __init__(self):
-		# your initiliser here
+		# your initializer here
 		pass
 
 	def main(self):

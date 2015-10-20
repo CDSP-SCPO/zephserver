@@ -25,10 +25,10 @@ from zephserversettings import CONFIGURATION_NETWORK_INTERFACE_SERVER
 
 class ExternalControl(Thread):
     '''
-        Class controlling the communication from the command script Actualy only used to 
+        Class controlling the communication from the command script. For now, it's only used to 
         stop the server.
 
-        this class is a sigleton.
+        this class is a singleton.
 
         Warning : this class use a UNIX socket and is not compatible with Windows
     '''
@@ -81,7 +81,7 @@ class ExternalControl(Thread):
             os.remove(CONFIGURATION_NETWORK_INTERFACE_SERVER)
         except : 
             pass
-        logging.info('external config closed')
+        logging.info('External config closed')
 
     def _execute(self, data):
         '''
@@ -107,7 +107,7 @@ class ExternalControl(Thread):
             return True
 
     def halt_external_control(self):
-        logging.warning('halt external control asked')
+        logging.warning('Halt external control asked')
         self._stop_server = True
         self._speaking_event.set()
         if self._main_socket != None:
@@ -130,12 +130,12 @@ class ExternalControl(Thread):
         '''
             Executing 'stop' command
         '''
-        logging.warning("stoping server asked")
+        logging.warning("Stopping server asked")
         self._bootstrap.command_stop()
 
     def say(self, data):
         '''
-            public method to print somthing on the command shell(if a command script in connected)
+            public method printing something on the command shell (if a command script is connected)
         '''
         if self._answer_socket != None:
             self._answer_socket.sendall(data + '\n')

@@ -50,7 +50,7 @@ def main(argv, target=None):
     while(ready):
         data = s.recv(1024)
         
-        if  data != None and data != '':#signal de fin de communication
+        if  data != None and data != '':#end communication signal
             lines = str(data).split('\n')
             for line in lines:
                 if '#!#end_communication#!#' == line:
@@ -81,7 +81,7 @@ def command(args):
 
 
 def is_unix_addr(addr):
-    # TODO better adress type detection
+    # TODO improve the adress type detection
     if ':' in addr: 
         return False
     else:
